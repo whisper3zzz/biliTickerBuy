@@ -43,6 +43,45 @@ btb
 btb buy ./your_config.json
 ```
 
+## 🖥️ 命令行模式（适用于远程 Linux 服务器）
+
+本项目支持纯命令行操作，无需图形界面，适合在远程服务器上使用：
+
+```bash
+# 1. 扫码登录（在终端显示二维码）
+btb login
+
+# 2. 查询票务信息
+btb info https://show.bilibili.com/platform/detail.html?id=84096
+
+# 3. 交互式生成抢票配置
+btb config
+
+# 4. 开始抢票
+btb buy ./your_config.json
+
+# 5. 定时抢票（指定开售时间）
+btb buy ./your_config.json --time_start 2024-01-01T10:00:00
+
+# 6. 更多选项
+btb buy --help
+```
+
+### 命令行完整选项
+
+| 命令 | 说明 |
+|------|------|
+| `btb login` | 扫码登录 B 站账号 |
+| `btb login --status` | 查看当前登录状态 |
+| `btb login --logout` | 注销当前账号 |
+| `btb login --cookies <file>` | 使用 cookies 文件登录 |
+| `btb config` | 交互式生成抢票配置文件 |
+| `btb info <url>` | 查询票务信息 |
+| `btb buy <config.json>` | 使用配置文件抢票 |
+| `btb buy <config.json> --interval 500` | 设置请求间隔（毫秒） |
+| `btb buy <config.json> --time_start 2024-01-01T10:00:00` | 定时开始抢票 |
+| `btb` | 启动 Web UI 界面 |
+
 ## 👀 使用说明书
 
 前往飞书： https://n1x87b5cqay.feishu.cn/wiki/Eg4xwt3Dbiah02k1WqOcVk2YnMd

@@ -35,15 +35,22 @@ def main():
 
     parser = argparse.ArgumentParser(
         description=(
-            "BiliTickerBuy\n\n"
-            "Use `btb buy` to buy tickets directly in the command line."
-            "Run `btb` without arguments to open the UI."
-            "Run `btb buy -h` for `btb buy` detailed options."
+            "BiliTickerBuy - B站会员购抢票工具\n\n"
+            "命令行模式 (适用于远程Linux服务器):\n"
+            "  btb login          扫码登录B站账号\n"
+            "  btb config         交互式生成抢票配置\n"
+            "  btb buy <file>     使用配置文件抢票\n"
+            "  btb info <url>     查询票务信息\n\n"
+            "图形界面模式:\n"
+            "  btb                打开Web UI界面\n"
         ),
         epilog=(
-            "Examples:\n"
-            "  btb buy tickets.json\n"
-            "  btb buy tickets.json --interval 500\n\n"
+            "命令行使用示例:\n"
+            "  btb login                        # 扫码登录\n"
+            "  btb config                       # 生成配置文件\n"
+            "  btb buy tickets.json             # 开始抢票\n"
+            "  btb buy tickets.json --interval 500 --time_start 2024-01-01T10:00:00\n"
+            "  btb info https://show.bilibili.com/platform/detail.html?id=84096\n\n"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
         parents=[gradio_parent],
@@ -51,8 +58,56 @@ def main():
     subparsers = parser.add_subparsers(
         dest="command",
         title="Available Commands",
-        metavar="{buy}",
+        metavar="{login,config,buy,info}",
         description="Use one of the following commands",
+    )
+
+    # ===== Login Command =====
+    login_parser = subparsers.add_parser(
+        "login",
+        help="Login to Bilibili via QR code (command line)",
+        description="Login to Bilibili account by scanning QR code in terminal",
+    )
+    login_parser.add_argument(
+        "--cookies",
+        type=str,
+        default="",
+        help="Path to cookies JSON file for login",
+    )
+    login_parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Only show current login status",
+    )
+    login_parser.add_argument(
+        "--logout",
+        action="store_true",
+        help="Logout current account",
+    )
+
+    # ===== Config Command =====
+    config_parser = subparsers.add_parser(
+        "config",
+        help="Generate ticket purchase configuration interactively",
+        description="Interactive configuration generator for ticket purchase",
+    )
+    config_parser.add_argument(
+        "--cookies_file",
+        type=str,
+        default="",
+        help="Path to cookies JSON file to use",
+    )
+
+    # ===== Info Command =====
+    info_parser = subparsers.add_parser(
+        "info",
+        help="Query ticket information from URL",
+        description="Display ticket information for a given project URL",
+    )
+    info_parser.add_argument(
+        "url",
+        type=str,
+        help="Ticket project URL, e.g. https://show.bilibili.com/platform/detail.html?id=84096",
     )
     buy_parser = subparsers.add_parser(
         "buy",
@@ -157,13 +212,21 @@ def main():
     )
 
     args = parser.parse_args()
-    if args.command == "buy":
+    
+    if args.command == "login":
+        from app_cmd.login import login_cmd
+        login_cmd(args=args)
+    elif args.command == "config":
+        from app_cmd.config import config_cmd
+        config_cmd(args=args)
+    elif args.command == "info":
+        from app_cmd.info import info_cmd
+        info_cmd(args=args)
+    elif args.command == "buy":
         from app_cmd.buy import buy_cmd
-
         buy_cmd(args=args)
     else:
         from app_cmd.ticker import ticker_cmd
-
         ticker_cmd(args=args)
 
 
