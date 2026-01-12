@@ -45,7 +45,9 @@ btb buy ./your_config.json
 
 ## 🖥️ 命令行模式（适用于远程 Linux 服务器）
 
-本项目支持纯命令行操作，无需图形界面，适合在远程服务器上使用：
+本项目支持纯命令行操作，无需图形界面，适合在远程服务器上使用。
+
+### 基础使用流程
 
 ```bash
 # 1. 扫码登录（在终端显示二维码）
@@ -62,25 +64,151 @@ btb buy ./your_config.json
 
 # 5. 定时抢票（指定开售时间）
 btb buy ./your_config.json --time_start 2024-01-01T10:00:00
-
-# 6. 更多选项
-btb buy --help
 ```
 
-### 命令行完整选项
+### 命令详细说明
 
-| 命令 | 说明 |
-|------|------|
-| `btb login` | 扫码登录 B 站账号 |
-| `btb login --status` | 查看当前登录状态 |
-| `btb login --logout` | 注销当前账号 |
-| `btb login --cookies <file>` | 使用 cookies 文件登录 |
-| `btb config` | 交互式生成抢票配置文件 |
-| `btb info <url>` | 查询票务信息 |
-| `btb buy <config.json>` | 使用配置文件抢票 |
-| `btb buy <config.json> --interval 500` | 设置请求间隔（毫秒） |
-| `btb buy <config.json> --time_start 2024-01-01T10:00:00` | 定时开始抢票 |
-| `btb` | 启动 Web UI 界面 |
+#### 1. 登录相关命令
+
+```bash
+# 扫码登录（推荐）
+btb login
+
+# 查看当前登录状态
+btb login --status
+
+# 注销当前账号
+btb login --logout
+
+# 使用 cookies 文件登录
+btb login --cookies ./cookies.json
+```
+
+#### 2. 配置生成命令
+
+```bash
+# 交互式生成抢票配置文件
+btb config
+
+# 指定使用特定的 cookies 文件
+btb config --cookies_file ./cookies.json
+```
+
+#### 3. 票务信息查询
+
+```bash
+# 查询票务信息
+btb info https://show.bilibili.com/platform/detail.html?id=84096
+```
+
+#### 4. 抢票命令（完整选项）
+
+```bash
+# 基础抢票
+btb buy ./tickets.json
+
+# 设置请求间隔（毫秒），默认 1000ms
+btb buy ./tickets.json --interval 500
+
+# 定时开始抢票
+btb buy ./tickets.json --time_start 2024-01-01T10:00:00
+
+# 使用代理
+btb buy ./tickets.json --https_proxys http://127.0.0.1:8080
+
+# 自定义 endpoint URL
+btb buy ./tickets.json --endpoint_url https://your-endpoint.com
+
+# 启用 Web UI 界面（适合 macOS）
+btb buy ./tickets.json --web
+
+# 隐藏失败时的随机消息
+btb buy ./tickets.json --hide_random_message
+```
+
+#### 5. 通知配置
+
+抢票成功/失败时可通过多种方式推送通知：
+
+```bash
+# 音频通知
+btb buy ./tickets.json --audio_path ./success.mp3
+
+# PushPlus 推送
+btb buy ./tickets.json --pushplusToken YOUR_TOKEN
+
+# ServerChan 推送
+btb buy ./tickets.json --serverchanKey YOUR_KEY
+
+# ServerChan3 推送
+btb buy ./tickets.json --serverchan3ApiUrl YOUR_API_URL
+
+# Bark 推送（iOS）
+btb buy ./tickets.json --barkToken YOUR_TOKEN
+
+# Ntfy 推送
+btb buy ./tickets.json --ntfy_url https://ntfy.sh/your-topic --ntfy_username user --ntfy_password pass
+```
+
+#### 6. Web UI 模式（图形界面）
+
+```bash
+# 启动 Web UI（默认 127.0.0.1:7860）
+btb
+
+# 自定义端口和地址
+btb --server_name 0.0.0.0 --port 8080
+
+# 公网分享（生成临时公网链接）
+btb --share
+```
+
+### 环境变量配置
+
+命令行参数也可以通过环境变量设置（适合 Docker 部署）：
+
+| 环境变量 | 对应参数 | 说明 |
+|---------|---------|------|
+| `BTB_SHARE` | `--share` | 是否分享公网链接 |
+| `BTB_SERVER_NAME` | `--server_name` | 服务器地址 |
+| `BTB_PORT` | `--port` | 服务器端口 |
+| `BTB_ENDPOINT_URL` | `--endpoint_url` | Endpoint URL |
+| `BTB_TIME_START` | `--time_start` | 开始时间 |
+| `BTB_HTTPS_PROXYS` | `--https_proxys` | HTTPS 代理 |
+| `BTB_AUDIO_PATH` | `--audio_path` | 音频文件路径 |
+| `BTB_PUSHPLUSTOKEN` | `--pushplusToken` | PushPlus Token |
+| `BTB_SERVERCHANKEY` | `--serverchanKey` | ServerChan Key |
+| `BTB_SERVERCHAN3APIURL` | `--serverchan3ApiUrl` | ServerChan3 API URL |
+| `BTB_BARKTOKEN` | `--barkToken` | Bark Token |
+| `BTB_NTFY_URL` | `--ntfy_url` | Ntfy 服务器 URL |
+| `BTB_NTFY_USERNAME` | `--ntfy_username` | Ntfy 用户名 |
+| `BTB_NTFY_PASSWORD` | `--ntfy_password` | Ntfy 密码 |
+
+示例：
+
+```bash
+export BTB_PORT=8080
+export BTB_SERVER_NAME=0.0.0.0
+btb
+```
+
+### Docker 部署示例
+
+```bash
+# 使用环境变量运行
+docker run -d \
+  -p 7860:7860 \
+  -e BTB_SERVER_NAME=0.0.0.0 \
+  -e BTB_PUSHPLUSTOKEN=your_token \
+  -v $(pwd)/config:/app/config \
+  bilitickerbuy:latest
+
+# 命令行模式运行
+docker run -it \
+  -v $(pwd)/config:/app/config \
+  bilitickerbuy:latest \
+  btb buy /app/config/tickets.json --interval 500
+```
 
 ## 👀 使用说明书
 
