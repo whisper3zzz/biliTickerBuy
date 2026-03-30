@@ -1,12 +1,15 @@
 import json
 import os
+import shlex
+import shutil
+import stat
 import subprocess
 import sys
+import tempfile
 import time
 from random import randint
 from datetime import datetime
 from json import JSONDecodeError
-import shutil
 import qrcode
 from loguru import logger
 
@@ -304,8 +307,23 @@ def buy_new_terminal(
     if terminal_ui == "网页":
         command.append("--web")
     command.extend(["--endpoint_url", endpoint_url])
+
     if terminal_ui == "网页":
         proc = subprocess.Popen(command)
+    elif sys.platform == "darwin":
+        # 写临时 shell 脚本，通过 osascript 在新 Terminal.app 窗口中运行
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".sh", delete=False, prefix="btb_"
+        ) as f:
+            f.write("#!/bin/bash\n")
+            f.write(" ".join(shlex.quote(str(a)) for a in command) + "\n")
+            f.write('echo ""\necho "任务结束，按 Enter 关闭窗口..."\nread\n')
+            tmp_path = f.name
+        os.chmod(tmp_path, stat.S_IRWXU)
+        apple_script = 'tell application "Terminal" to do script "{}"'.format(
+            tmp_path.replace('"', '\\"')
+        )
+        proc = subprocess.Popen(["osascript", "-e", apple_script])
     else:
         proc = subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_CONSOLE)
     return proc
