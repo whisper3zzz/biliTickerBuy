@@ -376,13 +376,13 @@ def go_tab(demo: gr.Blocks):
                 info="设置抢票任务之间的时间间隔（单位：毫秒），建议不要设置太小",
             )
             choices = ["网页"]
-            if platform.system() == "Windows":
-                choices.insert(0, "终端")  # 或 append，取决于你想要顺序
+            if platform.system() in ("Windows", "Darwin"):
+                choices.insert(0, "终端")
             terminal_ui = gr.Radio(
                 label="日志显示方式",
                 choices=choices,
                 value=choices[0],
-                info="日志显示的方式,非windows用戶只支持網頁",
+                info="日志显示的方式，仅 Windows / macOS 支持终端模式",
                 type="value",
                 interactive=True,
             )
