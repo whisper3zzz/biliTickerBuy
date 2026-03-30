@@ -318,6 +318,7 @@ def buy_new_terminal(
             f.write("#!/bin/bash\n")
             f.write(" ".join(shlex.quote(str(a)) for a in command) + "\n")
             f.write('echo ""\necho "任务结束，按 Enter 关闭窗口..."\nread\n')
+            f.write('rm -- "$0"\n')
             tmp_path = f.name
         os.chmod(tmp_path, stat.S_IRWXU)
         apple_script = 'tell application "Terminal" to do script "{}"'.format(
