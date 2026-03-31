@@ -119,12 +119,18 @@ btb buy ./tickets.json --https_proxys http://127.0.0.1:8080
 # 自定义 endpoint URL
 btb buy ./tickets.json --endpoint_url https://your-endpoint.com
 
-# 启用 Web UI 界面（适合 macOS）
+# 启用 Web UI 界面（在网页中查看日志）
 btb buy ./tickets.json --web
 
 # 隐藏失败时的随机消息
 btb buy ./tickets.json --hide_random_message
 ```
+
+> **日志显示方式说明：** 在 Web UI 的"开始抢票"页面，可选择日志显示方式：
+> - **网页**：日志实时显示在浏览器页面中（所有平台均支持）
+> - **终端**：在独立终端窗口中显示日志（支持 Windows 和 macOS）
+>   - Windows：在新的命令提示符窗口中运行
+>   - macOS：通过 Terminal.app 打开新窗口运行，任务结束后按 Enter 关闭
 
 #### 5. 通知配置
 
